@@ -154,6 +154,9 @@ def plot_strategy_comparison(history_feat, history_ft, model_name="model", save_
     return fig
 
 
+
+
+
 def plot_confusion_matrix(y_true, y_pred, class_names, top_n=None, save_path=None,
                            title="Confusion Matrix"):
     """
@@ -162,7 +165,6 @@ def plot_confusion_matrix(y_true, y_pred, class_names, top_n=None, save_path=Non
     test samples. Pass top_n=None to plot the full 102x102 matrix.
     """
     cm = confusion_matrix(y_true, y_pred, labels=range(len(class_names)))
-
     if top_n is not None:
         counts = cm.sum(axis=1)
         top_idx = np.argsort(counts)[::-1][:top_n]
@@ -174,7 +176,6 @@ def plot_confusion_matrix(y_true, y_pred, class_names, top_n=None, save_path=Non
     fig, ax = plt.subplots(figsize=(max(8, len(labels) * 0.35), max(6, len(labels) * 0.35)))
     im = ax.imshow(cm, cmap="Blues")
     fig.colorbar(im, ax=ax, fraction=0.046, pad=0.04)
-
     ax.set_xticks(range(len(labels)))
     ax.set_yticks(range(len(labels)))
     ax.set_xticklabels(labels, rotation=90, fontsize=6)
@@ -182,6 +183,21 @@ def plot_confusion_matrix(y_true, y_pred, class_names, top_n=None, save_path=Non
     ax.set_xlabel("Predicted")
     ax.set_ylabel("True")
     ax.set_title(title)
+
+    # Annotate each cell with its value; text color flips based on
+    # cell darkness so numbers stay readable on both light and dark cells.
+    thresh = cm.max() / 2.0 if cm.max() > 0 else 0
+    for i in range(cm.shape[0]):
+        for j in range(cm.shape[1]):
+            value = cm[i, j]
+            if value == 0:
+                continue  # skip zeros to reduce clutter on large matrices
+            ax.text(
+                j, i, format(value, "d"),
+                ha="center", va="center",
+                fontsize=6,
+                color="white" if value > thresh else "black"
+            )
 
     fig.tight_layout()
     if save_path:
